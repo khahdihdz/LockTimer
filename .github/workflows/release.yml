@@ -34,14 +34,13 @@ jobs:
           TAG: ${{ github.ref_name }}
         run: |
           set -euo pipefail
-          src="signed-apks/app-release-signed.apk"
-          dest="signed-apks/LockTimer-${TAG}.apk"
-          if [ ! -f "$src" ]; then
-            echo "Expected $src but not found:"
+          apk="$(find signed-apks -name '*.apk' -type f | sort | head -1)"
+          if [ -z "$apk" ]; then
+            echo "No APK found in signed-apks:"
             ls -la signed-apks
             exit 1
           fi
-          mv "$src" "$dest"
+          mv "$apk" "signed-apks/LockTimer-${TAG}.apk"
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
