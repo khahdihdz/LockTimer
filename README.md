@@ -1,5 +1,7 @@
 # LockTimer — Hẹn Giờ Khóa Máy
 
+![License: MIT](https://img.shields.io/badge/License-MIT-8ab4f8.svg)
+
 App Android native (Kotlin + Jetpack Compose) cho phép hẹn một khoảng thời gian
 (5/15/30 phút, 1–2 giờ hoặc tùy chỉnh). Khi đếm ngược hết giờ, máy sẽ **tự động
 khóa màn hình** — ví dụ hẹn 15 phút trước khi đi ngủ.
@@ -106,6 +108,14 @@ Chuỗi log bình thường: `scheduleLockAlarm ...` → `onStartCommand action=
 `onEnableFailed` không xuất hiện; nếu chỉ thấy `finishNow()` mà admin
 active=false → app cần cấp lại quyền Device Admin).
 
-## License
+## Giấy phép (License)
 
-MIT
+Dự án phát hành theo **MIT License** — bản quyền © 2026 **khahdihdz**.
+Toàn bộ nội dung nằm trong file [`LICENSE`](LICENSE).
+
+Tóm tắt: bạn được tự do sử dụng, sao chép, sửa đổi, phân phối lại và thương mại
+hóa phần mềm, miễn là giữ nguyên dòng bản quyền + giấy phép trong bản phân phối.
+Phần mềm cung cấp "AS IS", không kèm bảo hành gì.
+
+Lưu ý khi phân phối lại APK: vui lòng không ký chữ ký khác nhưng vẫn dùng đúng
+tên/mô tả bản chính thức của tác giả, tránh gây nhầm lẫn cho người dùng.
