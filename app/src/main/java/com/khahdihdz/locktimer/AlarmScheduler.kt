@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 
 /**
  * Lên lịch alarm "dự phòng" tại đúng thời điểm kết thúc. Dù foreground service bị
@@ -19,6 +20,10 @@ object AlarmScheduler {
         val pendingIntent = lockPendingIntent(context)
         val canScheduleExact =
             Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms()
+        Log.i(
+            CountdownFinisher.TAG,
+            "scheduleLockAlarm at=$triggerAtRtcMillis now=${System.currentTimeMillis()} exact=$canScheduleExact"
+        )
         if (canScheduleExact) {
             alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP, triggerAtRtcMillis, pendingIntent

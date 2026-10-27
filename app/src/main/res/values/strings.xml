@@ -9,6 +9,8 @@
     <string name="notif_timer_title">Đang đếm ngược khóa máy</string>
     <string name="notif_locked_title">Đã khóa máy theo hẹn giờ</string>
     <string name="notif_locked_text">Máy đã được khóa đúng giờ hẹn của LockTimer.</string>
+    <string name="notif_lock_failed_title">KHÔNG khóa được máy theo hẹn giờ</string>
+    <string name="notif_lock_failed_text">Thiếu quyền Device Admin. Mở lại app và cấp quyền rồi hẹn giờ lại.</string>
     <string name="ui_title">Hẹn giờ khóa máy</string>
     <string name="ui_start">Bắt đầu đếm ngược</string>
     <string name="ui_cancel">Hủy đếm giờ</string>

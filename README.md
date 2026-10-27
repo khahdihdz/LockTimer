@@ -68,12 +68,39 @@ app/src/main/java/com/khahdihdz/locktimer/
 ├── TimerRepository.kt        # Lưu thời điểm kết thúc (SharedPrefs)
 ├── AlarmScheduler.kt         # setExactAndAllowWhileIdle
 ├── CountdownService.kt       # Foreground service đếm ngược
+├── CountdownFinisher.kt      # Khóa máy (logic dùng chung)
 ├── AlarmReceiver.kt          # khóa máy khi alarm đổ chuông
 ├── BootReceiver.kt           # tái lập hẹn giờ sau reboot
 ├── Notifier.kt               # notification
 ├── LockDeviceAdminReceiver.kt# Device Admin (force-lock)
 └── TimeFormat.kt
 ```
+
+## Nếu màn hình không khóa khi hết giờ (troubleshooting)
+
+Từ v1.1.0, đường chính khóa máy là **foreground service tự khóa đúng thời
+điểm kết thúc trong tiến trình của nó**; alarm chỉ là dự phòng. Nếu vẫn không
+khóa được:
+
+1. **Xiaomi/MIUI/Miui HyperOS, Oppo/ColorOS, Vivo/OriginOS**: mở
+   *Cài đặt → Ứng dụng → LockTimer →* cho phép **Khởi chạy tự động (Autostart)**
+   và **Chạy ở nền không hạn chế**. các ROM này hay tắt cả alarm lẫn service
+   cho app không nằm trong danh sách white-list.
+2. Kiểm tra đã bật **"Alarms & reminders" (Báo thức & lời nhắc)** cho LockTimer
+   ở *Cài đặt → Ứng dụng → Quyền đặc biệt* (Android 12+).
+   Cấp quyền này app mới đặt được alarm chính xác.
+3. Cấp **loại trừ tối ưu pin** khi app yêu cầu (tên mục hiển thị khác nhau tùy
+   máy). Nếu bỏ qua, vào *Cài đặt → Ứng dụng → LockTimer → Pin → Không hạn chế*.
+4. Nếu vẫn lỗi: lấy log thiết bị, lọc tag `LockTimer` để xem đường kích hoạt nào bắn:
+
+```bash
+adb logcat -d -s LockTimer | tail -50
+```
+
+Chuỗi log bình thường: `scheduleLockAlarm ...` → `onStartCommand action=START`
+→ `handleStart ...` → `lockRunnable: locked at scheduled time` (dự phòng:
+`onEnableFailed` không xuất hiện; nếu chỉ thấy `finishNow()` mà admin
+active=false → app cần cấp lại quyền Device Admin).
 
 ## License
 

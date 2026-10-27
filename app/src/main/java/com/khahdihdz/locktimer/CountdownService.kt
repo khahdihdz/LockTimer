@@ -7,11 +7,13 @@ import android.os.Build
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
+import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 
 /**
- * Foreground service giữ đếm ngược + notification thời gian còn lại.
- * Thời điểm khóa thực tế được đảm bảo bởi AlarmScheduler (setExactAndAllowWhileIdle).
+ * PRIMARY path: foreground service giữ đếm ngược và **tự khóa đúng thời điểm
+ * kết thúc** (postDelayed + kiểm tra mỗi 10s). Alarm (AlarmScheduler) chỉ là
+ * cơ chế dự phòng khi cả service bị hệ thống thu hồi.
  */
 class CountdownService : Service() {
 
@@ -24,8 +26,17 @@ class CountdownService : Service() {
 
     private val handler = Handler(Looper.getMainLooper())
 
+    /** Chạy đúng thời điểm kết thúc đang được hẹn: khóa máy. */
+    private val lockRunnable = Runnable {
+        if (CountdownFinisher.finishIfDue(this)) {
+            Log.i(CountdownFinisher.TAG, "lockRunnable: locked at scheduled time")
+        }
+    }
+
     private val notificationUpdater = object : Runnable {
         override fun run() {
+            // An toàn: nếu lockRunnable bị trễ/mất thì ticker này vẫn chốt
+            if (CountdownFinisher.finishIfDue(this@CountdownService)) return
             val remaining =
                 TimerRepository.endTimeRtc(this@CountdownService) - System.currentTimeMillis()
             if (remaining <= 0L) return
@@ -37,15 +48,18 @@ class CountdownService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.i(CountdownFinisher.TAG, "onStartCommand action=${intent?.action ?: "redelivered"}")
         when (intent?.action) {
             ACTION_CANCEL -> {
-                handler.removeCallbacks(notificationUpdater)
+                handler.removeCallbacksAndMessages(null)
                 NotificationManagerCompat.from(this).cancel(Notifier.ID_TIMER)
                 stopSelf()
                 return START_NOT_STICKY
             }
             ACTION_START, null -> {
-                if (handleStart()) return START_REDELIVER_INTENT
+                if (handleStart()) {
+                    return START_REDELIVER_INTENT
+                }
                 stopSelf()
                 return START_NOT_STICKY
             }
@@ -57,7 +71,7 @@ class CountdownService : Service() {
     }
 
     override fun onDestroy() {
-        handler.removeCallbacks(notificationUpdater)
+        handler.removeCallbacksAndMessages(null)
         super.onDestroy()
     }
 
@@ -66,9 +80,17 @@ class CountdownService : Service() {
         val endTime = TimerRepository.endTimeRtc(this)
         if (endTime <= System.currentTimeMillis()) return false
 
+        Log.i(
+            CountdownFinisher.TAG,
+            "handleStart end=$endTime now=${System.currentTimeMillis()} minus=${endTime - System.currentTimeMillis()}"
+        )
         AlarmScheduler.scheduleLockAlarm(this, endTime)
         startInForeground(formatRemaining(endTime - System.currentTimeMillis()))
-        handler.removeCallbacks(notificationUpdater)
+
+        handler.removeCallbacksAndMessages(null)
+        // Primary: khóa đúng giây kết thúc trong tiến trình của service
+        handler.postDelayed(lockRunnable, endTime - System.currentTimeMillis())
+        // Fallback: kiểm tra phụ thêm mỗi 10s (nếu postDelayed bị trễ)
         handler.postDelayed(notificationUpdater, NOTIFICATION_UPDATE_INTERVAL_MS)
         return true
     }

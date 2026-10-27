@@ -63,10 +63,13 @@ object Notifier {
             .build()
     }
 
-    fun lockedNotification(context: Context): Notification =
+    fun lockedNotification(context: Context, lockSucceeded: Boolean = true): Notification =
         NotificationCompat.Builder(context, CHANNEL_LOCKED)
             .setSmallIcon(R.drawable.ic_timer)
-            .setContentTitle(context.getString(R.string.notif_locked_title))
+            .setContentTitle(
+                if (lockSucceeded) context.getString(R.string.notif_locked_title)
+                else context.getString(R.string.notif_lock_failed_title)
+            )
             .setContentText(context.getString(R.string.notif_locked_text))
             .setAutoCancel(true)
             .build()
