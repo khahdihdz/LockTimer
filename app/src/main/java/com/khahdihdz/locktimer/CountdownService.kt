@@ -76,11 +76,11 @@ class CountdownService : Service() {
     private fun startInForeground(remainingText: String) {
         Notifier.ensureChannels(this)
         val notification = Notifier.timerNotification(this, remainingText)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             startForeground(
                 Notifier.ID_TIMER,
                 notification,
-                ServiceInfo.FOREGROUND_SERVICE_TYPE_STOPWATCH
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE
             )
         } else {
             startForeground(Notifier.ID_TIMER, notification)
