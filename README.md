@@ -17,6 +17,10 @@ khóa màn hình** — ví dụ hẹn 15 phút trước khi đi ngủ.
 - Dừng / hủy bất cứ lúc nào; xin quyền `SCHEDULE_EXACT_ALARM` (Android 12+),
   `POST_NOTIFICATIONS` (Android 13+) và gợi ý loại trừ tối ưu pin.
 
+## Landing page
+
+Trang chính thức tại: https://khahdihdz.github.io/LockTimer/
+
 ## Quyền cần cấp khi dùng lần đầu
 
 1. **Device Admin** — bắt buộc, app sẽ mở sẵn màn hình cấp quyền khi bạn nhấn
