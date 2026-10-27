@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Hẹn Giờ Khóa Máy</string>
+    <string name="device_admin_explanation">LockTimer cần quyền Device Admin để tự động khóa màn hình khi hết giờ hẹn. Quyền này chỉ dùng cho chức năng khóa màn hình, không quản lý thiết bị.</string>
+    <string name="notif_channel_timer">Đếm ngược hẹn giờ</string>
+    <string name="notif_channel_timer_desc">Thông báo thời gian còn lại của hẹn giờ khóa máy</string>
+    <string name="notif_channel_locked">Kết quả hẹn giờ</string>
+    <string name="notif_channel_locked_desc">Thông báo khi máy đã được khóa theo hẹn giờ</string>
+    <string name="notif_timer_title">Đang đếm ngược khóa máy</string>
+    <string name="notif_locked_title">Đã khóa máy theo hẹn giờ</string>
+    <string name="notif_locked_text">Máy đã được khóa đúng giờ hẹn của LockTimer.</string>
+    <string name="ui_title">Hẹn giờ khóa máy</string>
+    <string name="ui_start">Bắt đầu đếm ngược</string>
+    <string name="ui_cancel">Hủy đếm giờ</string>
+    <string name="ui_minutes_label">Số phút tùy chỉnh</string>
+    <string name="ui_idle_hint">Máy sẽ tự khóa màn hình sau thời gian bạn chọn.</string>
+    <string name="ui_running_hint">Máy sẽ tự khóa khi đếm hết thời gian.</string>
+    <string name="chip_minutes">%1$d phút</string>
+    <string name="chip_hours">%1$d giờ</string>
+    <string name="admin_denied">Bạn chưa cấp quyền Device Admin nên chưa thể hẹn giờ khóa máy.</string>
+    <string name="admin_error">Không thể mở màn hình cấp quyền Device Admin.</string>
+</resources>

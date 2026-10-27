@@ -1,0 +1,51 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+jobs:
+  # Build assembleRelease rồi zipalign + apksigner sign với keystore dùng chung
+  # của repo khahdihdz/apksign (secret ANDROID_SIGNING_* đồng bộ tự động sang repo này).
+  build-sign:
+    uses: khahdihdz/apksign/.github/workflows/android-shared-signing.yml@main
+    with:
+      project-dir: "."
+      gradle-task: "assembleRelease"
+    secrets: inherit
+
+  release:
+    needs: build-sign
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download signed APKs
+        uses: actions/download-artifact@v4
+        with:
+          name: android-signed-apks
+          path: signed-apks
+
+      - name: Rename APK with tag
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          src="signed-apks/app-release-signed.apk"
+          dest="signed-apks/LockTimer-${TAG}.apk"
+          if [ ! -f "$src" ]; then
+            echo "Expected $src but not found:"
+            ls -la signed-apks
+            exit 1
+          fi
+          mv "$src" "$dest"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            signed-apks/LockTimer-${{ github.ref_name }}.apk
+          generate_release_notes: true
