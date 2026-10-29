@@ -78,7 +78,11 @@ class CountdownService : Service() {
     /** @return true nếu có phiên hẹn giờ đang chạy, false nếu không hợp lệ. */
     private fun handleStart(): Boolean {
         val endTime = TimerRepository.endTimeRtc(this)
-        if (endTime <= System.currentTimeMillis()) return false
+        if (endTime <= System.currentTimeMillis()) {
+            // Nếu service được khởi động lại sau deadline, vẫn chạy logic kết thúc.
+            CountdownFinisher.finishIfDue(this)
+            return false
+        }
 
         Log.i(
             CountdownFinisher.TAG,
