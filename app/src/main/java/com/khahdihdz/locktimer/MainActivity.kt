@@ -85,6 +85,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        VersionUpdateChecker.check(this)
         setContent {
             LockTimerTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
