@@ -217,6 +217,18 @@ fun LockTimerScreen(
         } else {
             RunningContent(state = state, onCancel = onCancel)
         }
+
+        Spacer(modifier = Modifier.height(24.dp))
+        val uriHandler = LocalUriHandler.current
+        Text(
+            text = stringResource(R.string.ui_credit),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.primary,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.clickable {
+                runCatching { uriHandler.openUri("https://khahdihdz.github.io") }
+            }
+        )
     }
 }
 
