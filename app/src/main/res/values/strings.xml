@@ -21,4 +21,9 @@
     <string name="chip_hours">%1$d giờ</string>
     <string name="admin_denied">Bạn chưa cấp quyền Device Admin nên chưa thể hẹn giờ khóa máy.</string>
     <string name="admin_error">Không thể mở màn hình cấp quyền Device Admin.</string>
+    <string name="update_channel_name">Cập nhật LockTimer</string>
+    <string name="update_channel_description">Thông báo khi có phiên bản LockTimer mới</string>
+    <string name="update_available_title">Đã có LockTimer %1$s</string>
+    <string name="update_available_text">Có phiên bản mới. Nhấn để xem ghi chú phát hành và tải APK từ GitHub Releases.</string>
+    <string name="ui_credit">Phát triển bởi khahdihdz.github.io</string>
 </resources>

@@ -19,6 +19,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -53,6 +54,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -83,6 +85,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        VersionUpdateChecker.check(this)
         setContent {
             LockTimerTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
@@ -215,6 +218,18 @@ fun LockTimerScreen(
         } else {
             RunningContent(state = state, onCancel = onCancel)
         }
+
+        Spacer(modifier = Modifier.height(24.dp))
+        val uriHandler = LocalUriHandler.current
+        Text(
+            text = stringResource(R.string.ui_credit),
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.primary,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.clickable {
+                runCatching { uriHandler.openUri("https://khahdihdz.github.io") }
+            }
+        )
     }
 }
 
