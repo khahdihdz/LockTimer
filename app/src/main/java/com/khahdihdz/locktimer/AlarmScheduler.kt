@@ -29,7 +29,7 @@ object AlarmScheduler {
                 AlarmManager.RTC_WAKEUP, triggerAtRtcMillis, pendingIntent
             )
         } else {
-            // fallback: alarm không chính xác tuyệt đối nhưng vẫn bắn trong khoảng 60s
+            // Fallback không chính xác; Android có thể kéo dài cửa sổ tối thiểu (đặc biệt Android 12+).
             alarmManager.setWindow(AlarmManager.RTC_WAKEUP, triggerAtRtcMillis, 60_000L, pendingIntent)
         }
     }
