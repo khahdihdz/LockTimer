@@ -12,6 +12,8 @@
     <string name="notif_lock_failed_title">KHÔNG khóa được máy theo hẹn giờ</string>
     <string name="notif_lock_failed_text">Thiếu quyền Device Admin. Mở lại app và cấp quyền rồi hẹn giờ lại.</string>
     <string name="ui_title">Hẹn giờ khóa máy</string>
+    <string name="about_website">Trang web chính thức · khahdihdz.github.io/LockTimer</string>
+    <string name="about_author">Phát triển bởi khahdihdz · GitHub</string>
     <string name="ui_start">Bắt đầu đếm ngược</string>
     <string name="ui_cancel">Hủy đếm giờ</string>
     <string name="ui_minutes_label">Số phút tùy chỉnh</string>
