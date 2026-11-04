@@ -19,6 +19,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,6 +55,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -215,6 +217,48 @@ fun LockTimerScreen(
         } else {
             RunningContent(state = state, onCancel = onCancel)
         }
+
+        Spacer(modifier = Modifier.height(32.dp))
+        AboutFooter()
+    }
+}
+
+@Composable
+private fun AboutFooter() {
+    val context = LocalContext.current
+    val linkColor = MaterialTheme.colorScheme.primary
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.about_website),
+            color = linkColor,
+            style = MaterialTheme.typography.bodySmall,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.clickable {
+                runCatching {
+                    context.startActivity(
+                        Intent(Intent.ACTION_VIEW, Uri.parse("https://khahdihdz.github.io/LockTimer/"))
+                    )
+                }
+            }
+        )
+        Text(
+            text = stringResource(R.string.about_author),
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.72f),
+            style = MaterialTheme.typography.bodySmall,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.clickable {
+                runCatching {
+                    context.startActivity(
+                        Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/khahdihdz"))
+                    )
+                }
+            }
+        )
     }
 }
 
