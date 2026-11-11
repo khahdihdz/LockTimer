@@ -120,13 +120,26 @@ class MainActivity : ComponentActivity() {
                                 Text("Đang kiểm tra kích hoạt…")
                             } else if (!licenseActive) {
                                 LicenseScreen(
-                                    onTrial = { licenseManager.trial() },
-                                    onActivate = { licenseManager.activate(it) },
-                                    onRetry = { licenseManager.check() },
+                                    onTrial = { licenseManager.trial().also { licenseStatus = it } },
+                                    onActivate = { licenseManager.activate(it).also { licenseStatus = it } },
+                                    onRetry = { licenseManager.check().also { licenseStatus = it } },
                                     onSuccess = { licenseActive = true }
                                 )
+                            } else if (showLicenseManagement) {
+                                LicenseManagementScreen(
+                                    status = licenseStatus,
+                                    onRefresh = { licenseManager.check() },
+                                    onActivate = { licenseManager.activate(it) },
+                                    onStatusChanged = { licenseStatus = it; licenseActive = it.active },
+                                    onBack = { showLicenseManagement = false }
+                                )
                             } else {
-                                LockTimerScreen(state = state, onStart = ::onStartRequested, onCancel = viewModel::cancel)
+                                LockTimerScreen(
+                                    state = state,
+                                    onStart = ::onStartRequested,
+                                    onCancel = viewModel::cancel,
+                                    onManageLicense = { showLicenseManagement = true }
+                                )
                             }
                         }
                     }
@@ -276,7 +289,8 @@ fun LockTimerTheme(content: @Composable () -> Unit) {
 fun LockTimerScreen(
     state: TimerUiState,
     onStart: (Int) -> Unit,
-    onCancel: () -> Unit
+    onCancel: () -> Unit,
+    onManageLicense: () -> Unit
 ) {
     var minutesText by remember { mutableStateOf("15") }
 
@@ -307,7 +321,11 @@ fun LockTimerScreen(
             RunningContent(state = state, onCancel = onCancel)
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(20.dp))
+        OutlinedButton(onClick = onManageLicense, modifier = Modifier.fillMaxWidth()) {
+            Text("Quản lý bản quyền")
+        }
+        Spacer(modifier = Modifier.height(12.dp))
         AboutFooter()
     }
 }
