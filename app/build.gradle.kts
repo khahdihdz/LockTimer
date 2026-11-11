@@ -12,8 +12,8 @@ android {
         applicationId = "com.khahdihdz.locktimer"
         minSdk = 24
         targetSdk = 35
-        versionCode = 4
-        versionName = "1.1.2"
+        versionCode = 5
+        versionName = "1.2.0"
         buildConfigField("String", "LICENSE_API_URL", "\"https://locktimer-license.khahdihdz.workers.dev\"")
     }
 
