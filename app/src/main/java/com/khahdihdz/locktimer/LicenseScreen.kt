@@ -1,6 +1,8 @@
 package com.khahdihdz.locktimer
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -154,6 +156,126 @@ fun LicenseScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Kiểm tra lại")
+        }
+    }
+}
+
+
+// Màn hình quản lý bản quyền dành cho người dùng đã vào ứng dụng.
+@Composable
+fun LicenseManagementScreen(
+    status: LicenseStatus,
+    onRefresh: suspend () -> LicenseStatus,
+    onActivate: suspend (String) -> LicenseStatus,
+    onStatusChanged: (LicenseStatus) -> Unit,
+    onBack: () -> Unit
+) {
+    var key by remember { mutableStateOf("") }
+    var message by remember { mutableStateOf("Bạn có thể kiểm tra bản quyền hoặc nhập key khác.") }
+    var busy by remember { mutableStateOf(false) }
+    var showKey by remember { mutableStateOf(false) }
+    val clipboard = LocalClipboardManager.current
+    val scope = rememberCoroutineScope()
+
+    fun run(action: suspend () -> LicenseStatus) {
+        if (busy) return
+        scope.launch {
+            busy = true
+            try {
+                val result = withContext(Dispatchers.IO) { action() }
+                onStatusChanged(result)
+                message = result.message
+            } finally {
+                busy = false
+            }
+        }
+    }
+
+    val expiry = status.expiresAt?.let {
+        SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(it * 1000L))
+    }
+
+    Column(
+        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(24.dp),
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text("Quản lý bản quyền", style = MaterialTheme.typography.headlineMedium)
+        Spacer(Modifier.height(16.dp))
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(Modifier.padding(16.dp)) {
+                Text(
+                    if (status.active) "Trạng thái: Đang hoạt động" else "Trạng thái: Chưa xác thực",
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(Modifier.height(6.dp))
+                Text(status.message)
+                Text(
+                    when {
+                        status.trial && expiry != null -> "Dùng thử đến: $expiry"
+                        status.trial -> "Gói dùng thử 7 ngày"
+                        expiry != null -> "Hết hạn: $expiry"
+                        status.active -> "Thời hạn: Vĩnh viễn"
+                        else -> "Chưa có thông tin thời hạn"
+                    },
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Spacer(Modifier.height(12.dp))
+                OutlinedButton(
+                    onClick = { run { onRefresh() } },
+                    enabled = !busy,
+                    modifier = Modifier.fillMaxWidth()
+                ) { Text(if (busy) "Đang kiểm tra…" else "Kiểm tra bản quyền") }
+            }
+        }
+
+        Spacer(Modifier.height(24.dp))
+        Text("Đổi / nhập License Key mới", style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(8.dp))
+        OutlinedTextField(
+            value = key,
+            onValueChange = { key = it.uppercase(Locale.ROOT).filterNot { ch -> ch.isWhitespace() } },
+            label = { Text("License Key mới") },
+            placeholder = { Text("LT-XXXX-XXXX-...") },
+            singleLine = true,
+            visualTransformation = if (showKey) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                TextButton(onClick = { showKey = !showKey }) { Text(if (showKey) "Ẩn" else "Hiện") }
+            },
+            enabled = !busy,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            TextButton(
+                onClick = {
+                    val pasted = clipboard.getText()?.text.orEmpty()
+                        .trim().uppercase(Locale.ROOT).filterNot { it.isWhitespace() }
+                    if (pasted.isNotEmpty()) {
+                        key = pasted
+                        message = "Đã dán key. Nhấn Đổi key để xác minh."
+                    } else message = "Clipboard đang trống."
+                },
+                enabled = !busy
+            ) { Text("Dán key") }
+            TextButton(onClick = { key = "" }, enabled = !busy && key.isNotEmpty()) { Text("Xóa") }
+        }
+        Text(message, style = MaterialTheme.typography.bodySmall)
+        Spacer(Modifier.height(8.dp))
+        Button(
+            onClick = {
+                val normalized = key.trim().uppercase(Locale.ROOT)
+                if (!LICENSE_KEY_PATTERN.matches(normalized)) {
+                    message = "Định dạng key không hợp lệ. Hãy kiểm tra LT-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX."
+                } else {
+                    run { onActivate(normalized) }
+                }
+            },
+            enabled = !busy && key.isNotBlank(),
+            modifier = Modifier.fillMaxWidth()
+        ) { Text(if (busy) "Đang xác minh…" else "Đổi / kích hoạt key mới") }
+
+        Spacer(Modifier.height(12.dp))
+        OutlinedButton(onClick = onBack, enabled = !busy, modifier = Modifier.fillMaxWidth()) {
+            Text("Quay lại")
         }
     }
 }
