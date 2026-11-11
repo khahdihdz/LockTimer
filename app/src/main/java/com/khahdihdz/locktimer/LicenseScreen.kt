@@ -221,7 +221,18 @@ fun LicenseManagementScreen(
                 )
                 Spacer(Modifier.height(12.dp))
                 OutlinedButton(
-                    onClick = { run { onRefresh() } },
+                    onClick = {
+                        val normalized = key.trim().uppercase(Locale.ROOT)
+                        if (normalized.isNotEmpty()) {
+                            if (!LICENSE_KEY_PATTERN.matches(normalized)) {
+                                message = "Định dạng key không hợp lệ. Hãy kiểm tra LT-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX."
+                            } else {
+                                run { onActivate(normalized) }
+                            }
+                        } else {
+                            run { onRefresh() }
+                        }
+                    },
                     enabled = !busy,
                     modifier = Modifier.fillMaxWidth()
                 ) { Text(if (busy) "Đang kiểm tra…" else "Kiểm tra bản quyền") }
