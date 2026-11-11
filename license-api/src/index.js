@@ -19,15 +19,20 @@ export default {
     if(!l||l.status!=="active"||(l.expires_at&&l.expires_at<=now()))return out({active:false,code:"invalid_or_expired"},403);
     const n=await env.DB.prepare("SELECT COUNT(*) n FROM license_devices WHERE license_id=?").bind(l.id).first(),exists=await env.DB.prepare("SELECT id FROM license_devices WHERE license_id=? AND device_hash=?").bind(l.id,dh).first();
     if(!exists&&n.n>=l.max_devices)return out({active:false,code:"device_limit"},403);
-    await env.DB.prepare("INSERT OR IGNORE INTO license_devices(license_id,device_hash,activated_at) VALUES(?,?,?)").bind(l.id,dh,now()).run();
+    // One active license per device: replace the previous binding only after the new key passes validation.
+    await env.DB.batch([
+      env.DB.prepare("DELETE FROM license_devices WHERE device_hash=?").bind(dh),
+      env.DB.prepare("INSERT INTO license_devices(license_id,device_hash,activated_at) VALUES(?,?,?)").bind(l.id,dh,now())
+    ]);
     return out({active:true,trial:false,expiresAt:l.expires_at});
    }
    if(u.pathname==="/api/validate"&&req.method==="POST"){
     const b=await body(),dh=await hash("locktimer:"+String(b.deviceId||""));
-    const t=await env.DB.prepare("SELECT expires_at FROM trials WHERE device_hash=?").bind(dh).first();
-    if(t&&t.expires_at>now())return out({active:true,trial:true,expiresAt:t.expires_at});
+    // A paid license takes precedence over any unexpired trial on the same device.
     const l=await env.DB.prepare("SELECT l.expires_at FROM licenses l JOIN license_devices d ON d.license_id=l.id WHERE d.device_hash=? AND l.status='active' LIMIT 1").bind(dh).first();
     if(l&&(!l.expires_at||l.expires_at>now()))return out({active:true,trial:false,expiresAt:l.expires_at});
+    const t=await env.DB.prepare("SELECT expires_at FROM trials WHERE device_hash=?").bind(dh).first();
+    if(t&&t.expires_at>now())return out({active:true,trial:true,expiresAt:t.expires_at});
     return out({active:false,code:t?"trial_expired":"activation_required"},403);
    }
    if(u.pathname.startsWith("/api/admin/")){
