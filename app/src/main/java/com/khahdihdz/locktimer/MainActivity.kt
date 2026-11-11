@@ -62,12 +62,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
 
     private var pendingStartMinutes: Int? = null
 
     private val viewModel: TimerViewModel by viewModels()
+    private var licenseActive by mutableStateOf(false)
+    private var licenseChecked by mutableStateOf(false)
+    private val licenseManager by lazy { LicenseManager(this) }
 
     private val adminLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -85,15 +92,24 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        lifecycleScope.launch(Dispatchers.IO) {
+            val result = licenseManager.check()
+            withContext(Dispatchers.Main) { licenseActive = result.active; licenseChecked = true }
+        }
         setContent {
             LockTimerTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     val state by viewModel.state.collectAsState()
-                    LockTimerScreen(
-                        state = state,
-                        onStart = ::onStartRequested,
-                        onCancel = viewModel::cancel
-                    )
+                    if (!licenseChecked || !licenseActive) {
+                        LicenseScreen(
+                            onTrial = { licenseManager.trial() },
+                            onActivate = { licenseManager.activate(it) },
+                            onRetry = { licenseManager.check() },
+                            onSuccess = { licenseActive = true }
+                        )
+                    } else {
+                        LockTimerScreen(state = state, onStart = ::onStartRequested, onCancel = viewModel::cancel)
+                    }
                 }
             }
         }
