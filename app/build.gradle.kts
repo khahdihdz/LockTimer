@@ -14,6 +14,7 @@ android {
         targetSdk = 35
         versionCode = 4
         versionName = "1.1.2"
+        buildConfigField("String", "LICENSE_API_URL", "\"https://locktimer-license.khahdihdz.workers.dev\"")
     }
 
     buildTypes {
@@ -34,6 +35,7 @@ android {
     }
 
     buildFeatures {
+        buildConfig = true
         compose = true
     }
 }
