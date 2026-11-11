@@ -100,7 +100,9 @@ class MainActivity : ComponentActivity() {
             LockTimerTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
                     val state by viewModel.state.collectAsState()
-                    if (!licenseChecked || !licenseActive) {
+                    if (!licenseChecked) {
+                        Text("Đang kiểm tra kích hoạt…")
+                    } else if (!licenseActive) {
                         LicenseScreen(
                             onTrial = { licenseManager.trial() },
                             onActivate = { licenseManager.activate(it) },
