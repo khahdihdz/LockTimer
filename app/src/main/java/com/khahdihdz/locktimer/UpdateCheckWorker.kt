@@ -34,6 +34,9 @@ class UpdateCheckWorker(
     }
 
     private fun showNotification(update: UpdateInfo) {
+        val preferences = applicationContext.getSharedPreferences("release_updates", Context.MODE_PRIVATE)
+        if (preferences.getString("last_notified_version", null) == update.versionName) return
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
             ContextCompat.checkSelfPermission(
                 applicationContext,
@@ -73,6 +76,7 @@ class UpdateCheckWorker(
 
         if (NotificationManagerCompat.from(applicationContext).areNotificationsEnabled()) {
             NotificationManagerCompat.from(applicationContext).notify(NOTIFICATION_ID, notification)
+            preferences.edit().putString("last_notified_version", update.versionName).apply()
         }
     }
 
