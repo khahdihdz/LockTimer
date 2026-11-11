@@ -1,0 +1,8 @@
+name = "locktimer-license"
+main = "src/index.js"
+compatibility_date = "2026-11-11"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "locktimer-license"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
