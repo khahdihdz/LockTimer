@@ -48,12 +48,12 @@ jobs:
       - name: Manage licenses
         id: manage
         env:
-          ADMIN_TOKEN: \${{ secrets.ADMIN_TOKEN }}
-          ACTION: \${{ inputs.action }}
-          COUNT: \${{ inputs.count }}
-          DAYS: \${{ inputs.days }}
-          MAX_DEVICES: \${{ inputs.max_devices }}
-          LICENSE_ID: \${{ inputs.license_id }}
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
+          ACTION: ${{ inputs.action }}
+          COUNT: ${{ inputs.count }}
+          DAYS: ${{ inputs.days }}
+          MAX_DEVICES: ${{ inputs.max_devices }}
+          LICENSE_ID: ${{ inputs.license_id }}
           API_BASE: https://locktimer-license.khahdihdz.workers.dev
         run: |
           node <<'NODE'
