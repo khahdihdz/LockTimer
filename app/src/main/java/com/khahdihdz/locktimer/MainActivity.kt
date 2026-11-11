@@ -77,6 +77,8 @@ class MainActivity : ComponentActivity() {
     private val viewModel: TimerViewModel by viewModels()
     private var licenseActive by mutableStateOf(false)
     private var licenseChecked by mutableStateOf(false)
+    private var licenseStatus by mutableStateOf(LicenseStatus(false, "Đang kiểm tra bản quyền…"))
+    private var showLicenseManagement by mutableStateOf(false)
     private val licenseManager by lazy { LicenseManager(this) }
     private var updateInfo by mutableStateOf<UpdateInfo?>(null)
 
@@ -98,7 +100,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         lifecycleScope.launch(Dispatchers.IO) {
             val result = licenseManager.check()
-            withContext(Dispatchers.Main) { licenseActive = result.active; licenseChecked = true }
+            withContext(Dispatchers.Main) { licenseStatus = result; licenseActive = result.active; licenseChecked = true }
         }
         lifecycleScope.launch(Dispatchers.IO) {
             val latest = UpdateChecker.fetchLatest()
