@@ -3,6 +3,7 @@ package com.khahdihdz.locktimer
 import android.Manifest
 import android.app.Activity
 import android.app.AlarmManager
+import android.app.DownloadManager
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Context
@@ -12,6 +13,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.PowerManager
+import android.os.Environment
 import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -65,6 +67,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 
 class MainActivity : ComponentActivity() {
@@ -75,6 +78,7 @@ class MainActivity : ComponentActivity() {
     private var licenseActive by mutableStateOf(false)
     private var licenseChecked by mutableStateOf(false)
     private val licenseManager by lazy { LicenseManager(this) }
+    private var updateInfo by mutableStateOf<UpdateInfo?>(null)
 
     private val adminLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
@@ -96,25 +100,90 @@ class MainActivity : ComponentActivity() {
             val result = licenseManager.check()
             withContext(Dispatchers.Main) { licenseActive = result.active; licenseChecked = true }
         }
+        lifecycleScope.launch(Dispatchers.IO) {
+            val latest = UpdateChecker.fetchLatest()
+            withContext(Dispatchers.Main) { updateInfo = latest }
+        }
+        UpdateWorkScheduler.schedule(this)
         setContent {
             LockTimerTheme {
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    val state by viewModel.state.collectAsState()
-                    if (!licenseChecked) {
-                        Text("Đang kiểm tra kích hoạt…")
-                    } else if (!licenseActive) {
-                        LicenseScreen(
-                            onTrial = { licenseManager.trial() },
-                            onActivate = { licenseManager.activate(it) },
-                            onRetry = { licenseManager.check() },
-                            onSuccess = { licenseActive = true }
-                        )
-                    } else {
-                        LockTimerScreen(state = state, onStart = ::onStartRequested, onCancel = viewModel::cancel)
+                    Column(modifier = Modifier.fillMaxSize()) {
+                        updateInfo?.let { info ->
+                            UpdateBanner(info = info, onInstall = { installUpdate(info) })
+                        }
+                        Box(modifier = Modifier.weight(1f)) {
+                            val state by viewModel.state.collectAsState()
+                            if (!licenseChecked) {
+                                Text("Đang kiểm tra kích hoạt…")
+                            } else if (!licenseActive) {
+                                LicenseScreen(
+                                    onTrial = { licenseManager.trial() },
+                                    onActivate = { licenseManager.activate(it) },
+                                    onRetry = { licenseManager.check() },
+                                    onSuccess = { licenseActive = true }
+                                )
+                            } else {
+                                LockTimerScreen(state = state, onStart = ::onStartRequested, onCancel = viewModel::cancel)
+                            }
+                        }
                     }
                 }
             }
         }
+        requestNotificationPermissionIfNeeded()
+    }
+
+    private fun installUpdate(info: UpdateInfo) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !packageManager.canRequestPackageInstalls()) {
+            Toast.makeText(this, "Hãy cho phép LockTimer cài ứng dụng không rõ nguồn gốc rồi nhấn Cập nhật lại.", Toast.LENGTH_LONG).show()
+            runCatching {
+                startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:$packageName")))
+            }
+            return
+        }
+        lifecycleScope.launch {
+            try {
+                Toast.makeText(this@MainActivity, "Đang tải bản cập nhật…", Toast.LENGTH_SHORT).show()
+                val apkUri = withContext(Dispatchers.IO) { downloadUpdate(info) }
+                val intent = Intent(Intent.ACTION_VIEW).apply {
+                    setDataAndType(apkUri, "application/vnd.android.package-archive")
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                startActivity(intent)
+            } catch (error: Exception) {
+                Toast.makeText(this@MainActivity, "Không thể cập nhật: ${error.message}", Toast.LENGTH_LONG).show()
+            }
+        }
+    }
+
+    private fun downloadUpdate(info: UpdateInfo): Uri {
+        val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+        val request = DownloadManager.Request(Uri.parse(info.downloadUrl))
+            .setTitle("LockTimer ${info.versionName}")
+            .setDescription("Đang tải bản cập nhật")
+            .setMimeType("application/vnd.android.package-archive")
+            .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+            .setDestinationInExternalFilesDir(this, Environment.DIRECTORY_DOWNLOADS, info.assetName)
+        val id = manager.enqueue(request)
+        val started = System.currentTimeMillis()
+        while (System.currentTimeMillis() - started < 10 * 60 * 1000L) {
+            val query = DownloadManager.Query().setFilterById(id)
+            manager.query(query).use { cursor ->
+                if (cursor != null && cursor.moveToFirst()) {
+                    when (cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))) {
+                        DownloadManager.STATUS_SUCCESSFUL -> return manager.getUriForDownloadedFile(id)
+                            ?: error("Không lấy được tệp APK đã tải")
+                        DownloadManager.STATUS_FAILED -> {
+                            val reason = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_REASON))
+                            error("Tải APK thất bại (mã $reason)")
+                        }
+                    }
+                }
+            }
+            Thread.sleep(1000)
+        }
+        error("Quá thời gian chờ tải APK")
     }
 
     /** Nhấn Bắt đầu: chưa có Device Admin -> xin quyền rồi mới đếm. */
