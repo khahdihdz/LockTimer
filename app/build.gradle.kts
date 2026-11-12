@@ -4,8 +4,13 @@ plugins {
     id("org.jetbrains.kotlin.plugin.compose")
 }
 
-val admobAppId = providers.gradleProperty("ADMOB_APP_ID").orElse("").get()
-val admobBannerUnitId = providers.gradleProperty("ADMOB_BANNER_UNIT_ID").orElse("").get()
+// AdMob identifiers are public app configuration, not secrets. Keep Gradle
+// property overrides available for alternate environments while defaulting
+// to the production LockTimer Free ad unit.
+val admobAppId = providers.gradleProperty("ADMOB_APP_ID")
+    .orElse("ca-app-pub-3072219362662165~3863186283").get()
+val admobBannerUnitId = providers.gradleProperty("ADMOB_BANNER_UNIT_ID")
+    .orElse("ca-app-pub-3072219362662165/2190836959").get()
 
 android {
     namespace = "com.khahdihdz.locktimer"
@@ -27,7 +32,8 @@ android {
         }
         release {
             isMinifyEnabled = false
-            // Supply production IDs with -PADMOB_APP_ID=... -PADMOB_BANNER_UNIT_ID=...
+            // Production IDs default to the LockTimer AdMob account; Gradle
+            // properties can override them for CI or alternate build environments.
             buildConfigField("String", "ADMOB_APP_ID", "\"$admobAppId\"")
             buildConfigField("String", "ADMOB_BANNER_UNIT_ID", "\"$admobBannerUnitId\"")
             // Release APK signing remains handled by khahdihdz/apksign.
