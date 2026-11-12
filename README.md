@@ -121,8 +121,6 @@ Lưu ý khi phân phối lại APK: vui lòng không ký chữ ký khác nhưng 
 tên/mô tả bản chính thức của tác giả, tránh gây nhầm lẫn cho người dùng.
 
 
-## License Key (bắt buộc kích hoạt)
+## Kích hoạt
 
-LockTimer yêu cầu kích hoạt trực tuyến trước khi mở giao diện hẹn giờ. Người dùng có thể đăng ký **dùng thử 7 ngày** một lần theo Android ID hoặc nhập License Key. Key được ràng buộc thiết bị đầu tiên và backend lưu hash của key. Xem hướng dẫn triển khai Workers + D1 tại [license-api/README.md](license-api/README.md).
-
-> Trước khi phát hành, thay LICENSE_API_URL trong app/build.gradle.kts bằng URL Worker thực tế đã deploy. Workflow ký APK hiện tại không thay đổi.
+LockTimer là ứng dụng miễn phí, không yêu cầu License Key, tài khoản hoặc kích hoạt trực tuyến.
