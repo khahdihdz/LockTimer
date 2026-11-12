@@ -1,4 +1,0 @@
-CREATE TABLE IF NOT EXISTS trials(device_hash TEXT PRIMARY KEY,started_at INTEGER NOT NULL,expires_at INTEGER NOT NULL);
-CREATE TABLE IF NOT EXISTS licenses(id INTEGER PRIMARY KEY AUTOINCREMENT,key_hash TEXT NOT NULL UNIQUE,expires_at INTEGER,status TEXT NOT NULL DEFAULT 'active',max_devices INTEGER NOT NULL DEFAULT 1,created_at INTEGER NOT NULL);
-CREATE TABLE IF NOT EXISTS license_devices(id INTEGER PRIMARY KEY AUTOINCREMENT,license_id INTEGER NOT NULL REFERENCES licenses(id) ON DELETE CASCADE,device_hash TEXT NOT NULL,activated_at INTEGER NOT NULL,UNIQUE(license_id,device_hash));
-CREATE INDEX IF NOT EXISTS idx_license_devices_device ON license_devices(device_hash);
