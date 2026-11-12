@@ -105,13 +105,18 @@ class MainActivity : ComponentActivity() {
                         updateInfo?.let { info ->
                             UpdateBanner(info = info, onInstall = { installUpdate(info) })
                         }
+                        val state by viewModel.state.collectAsState()
                         Box(modifier = Modifier.weight(1f)) {
-                            val state by viewModel.state.collectAsState()
                             LockTimerScreen(
                                 state = state,
                                 onStart = ::onStartRequested,
                                 onCancel = viewModel::cancel
                             )
+                        }
+                        // Free edition shows a small banner only while idle.
+                        // Pro's source-set implementation is intentionally empty.
+                        if (!state.running) {
+                            EditionAdSlot()
                         }
                     }
                 }
