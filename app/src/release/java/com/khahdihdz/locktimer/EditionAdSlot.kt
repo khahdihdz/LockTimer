@@ -1,6 +1,7 @@
 package com.khahdihdz.locktimer
 
 import android.app.Activity
+import android.content.Context
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -21,7 +22,34 @@ import com.google.android.libraries.ads.mobile.sdk.banner.BannerAdRequest
 import com.google.android.libraries.ads.mobile.sdk.common.AdLoadCallback
 import com.google.android.libraries.ads.mobile.sdk.common.LoadAdError
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import kotlin.coroutines.resume
+
+private object LockTimerAdsSdk {
+    private val initializationMutex = Mutex()
+    private var initializedAppId: String? = null
+
+    suspend fun initialize(context: Context, appId: String) {
+        initializationMutex.withLock {
+            if (initializedAppId == appId) return
+
+            // GMA Next-Gen requires initialization on a background thread.
+            // Wait for its completion callback before issuing the first ad request.
+            suspendCancellableCoroutine<Unit> { continuation ->
+                MobileAds.initialize(
+                    context.applicationContext,
+                    InitializationConfig.Builder(appId).build()
+                ) {
+                    if (continuation.isActive) continuation.resume(Unit)
+                }
+            }
+            initializedAppId = appId
+        }
+    }
+}
 
 /**
  * Free edition only. A compact adaptive banner is shown on the idle screen;
@@ -36,19 +64,21 @@ fun EditionAdSlot() {
 
     // A release build without real AdMob IDs stays ad-free instead of sending
     // invalid production requests. Debug builds use Google's official test IDs.
-    if (appId.isBlank() || adUnitId.isBlank()) return
+    if (appId.isBlank() || adUnitId.isBlank()) {
+        Log.w("LockTimerAds", "Ads disabled: AdMob App ID or banner unit ID is blank")
+        return
+    }
 
     val adView = remember(activity) { AdView(activity) }
 
     LaunchedEffect(adView, appId, adUnitId) {
         try {
             withContext(Dispatchers.IO) {
-                MobileAds.initialize(
-                    context,
-                    InitializationConfig.Builder(appId).build()
-                ) { }
+                LockTimerAdsSdk.initialize(context, appId)
             }
 
+            // LaunchedEffect resumes on the main thread; AdView loading and
+            // view lifecycle operations must remain on the UI thread.
             val density = context.resources.displayMetrics.density
             val widthDp = (context.resources.displayMetrics.widthPixels / density).toInt()
             val adSize = AdSize.getLargeAnchoredAdaptiveBannerAdSize(activity, widthDp)
@@ -58,16 +88,16 @@ fun EditionAdSlot() {
                 request,
                 object : AdLoadCallback<BannerAd> {
                     override fun onAdLoaded(ad: BannerAd) {
-                        Log.d("LockTimerAds", "Free banner loaded")
+                        Log.i("LockTimerAds", "Free banner loaded successfully")
                     }
 
                     override fun onAdFailedToLoad(adError: LoadAdError) {
-                        Log.w("LockTimerAds", "Free banner failed: $adError")
+                        Log.e("LockTimerAds", "Free banner failed to load: $adError")
                     }
                 }
             )
         } catch (error: Exception) {
-            Log.w("LockTimerAds", "Unable to initialize ads", error)
+            Log.e("LockTimerAds", "Unable to initialize or load ads", error)
         }
     }
 
