@@ -75,11 +75,6 @@ class MainActivity : ComponentActivity() {
     private var pendingStartMinutes: Int? = null
 
     private val viewModel: TimerViewModel by viewModels()
-    private var licenseActive by mutableStateOf(false)
-    private var licenseChecked by mutableStateOf(false)
-    private var licenseStatus by mutableStateOf(LicenseStatus(false, "Đang kiểm tra bản quyền…"))
-    private var showLicenseManagement by mutableStateOf(false)
-    private val licenseManager by lazy { LicenseManager(this) }
     private var updateInfo by mutableStateOf<UpdateInfo?>(null)
 
     private val adminLauncher = registerForActivityResult(
@@ -99,10 +94,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         lifecycleScope.launch(Dispatchers.IO) {
-            val result = licenseManager.check()
-            withContext(Dispatchers.Main) { licenseStatus = result; licenseActive = result.active; licenseChecked = true }
-        }
-        lifecycleScope.launch(Dispatchers.IO) {
             val latest = UpdateChecker.fetchLatest()
             withContext(Dispatchers.Main) { updateInfo = latest }
         }
@@ -116,31 +107,11 @@ class MainActivity : ComponentActivity() {
                         }
                         Box(modifier = Modifier.weight(1f)) {
                             val state by viewModel.state.collectAsState()
-                            if (!licenseChecked) {
-                                Text("Đang kiểm tra kích hoạt…")
-                            } else if (!licenseActive) {
-                                LicenseScreen(
-                                    onTrial = { licenseManager.trial().also { licenseStatus = it } },
-                                    onActivate = { licenseManager.activate(it).also { licenseStatus = it } },
-                                    onRetry = { licenseManager.check().also { licenseStatus = it } },
-                                    onSuccess = { licenseActive = true }
-                                )
-                            } else if (showLicenseManagement) {
-                                LicenseManagementScreen(
-                                    status = licenseStatus,
-                                    onRefresh = { licenseManager.check() },
-                                    onActivate = { licenseManager.activate(it) },
-                                    onStatusChanged = { licenseStatus = it; licenseActive = it.active },
-                                    onBack = { showLicenseManagement = false }
-                                )
-                            } else {
-                                LockTimerScreen(
-                                    state = state,
-                                    onStart = ::onStartRequested,
-                                    onCancel = viewModel::cancel,
-                                    onManageLicense = { showLicenseManagement = true }
-                                )
-                            }
+                            LockTimerScreen(
+                                state = state,
+                                onStart = ::onStartRequested,
+                                onCancel = viewModel::cancel
+                            )
                         }
                     }
                 }
@@ -289,8 +260,7 @@ fun LockTimerTheme(content: @Composable () -> Unit) {
 fun LockTimerScreen(
     state: TimerUiState,
     onStart: (Int) -> Unit,
-    onCancel: () -> Unit,
-    onManageLicense: () -> Unit
+    onCancel: () -> Unit
 ) {
     var minutesText by remember { mutableStateOf("15") }
 
@@ -322,10 +292,6 @@ fun LockTimerScreen(
         }
 
         Spacer(modifier = Modifier.height(20.dp))
-        OutlinedButton(onClick = onManageLicense, modifier = Modifier.fillMaxWidth()) {
-            Text("Quản lý bản quyền")
-        }
-        Spacer(modifier = Modifier.height(12.dp))
         AboutFooter()
     }
 }
