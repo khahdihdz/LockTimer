@@ -29,4 +29,8 @@
     <string name="update_available_title">LockTimer %1$s is available</string>
     <string name="update_available_message">A new version is ready. You can download and install it directly from the app.</string>
     <string name="update_button">Download &amp; update</string>
+    <string name="update_download_description">Downloading LockTimer update</string>
+    <string name="update_download_file_missing">The downloaded APK file could not be found.</string>
+    <string name="update_download_failed_code">APK download failed (code %1$d).</string>
+    <string name="update_download_timeout">APK download timed out.</string>
 </resources>
