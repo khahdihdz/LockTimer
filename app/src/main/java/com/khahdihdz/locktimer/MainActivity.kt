@@ -384,19 +384,19 @@ private fun FeatureStrip() {
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            FeatureItem("◷", stringResource(R.string.feature_flexible))
-            FeatureItem("▣", stringResource(R.string.feature_auto_lock))
-            FeatureItem("↻", stringResource(R.string.feature_background))
+            FeatureItem("◷", stringResource(R.string.feature_flexible), Modifier.weight(1f))
+            FeatureItem("▣", stringResource(R.string.feature_auto_lock), Modifier.weight(1f))
+            FeatureItem("↻", stringResource(R.string.feature_background), Modifier.weight(1f))
         }
     }
 }
 
 @Composable
-private fun FeatureItem(symbol: String, label: String) {
+private fun FeatureItem(symbol: String, label: String, modifier: Modifier = Modifier) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(6.dp),
-        modifier = Modifier.weight(1f)
+        modifier = modifier
     ) {
         Text(symbol, color = MaterialTheme.colorScheme.primary, fontSize = 23.sp)
         Text(
