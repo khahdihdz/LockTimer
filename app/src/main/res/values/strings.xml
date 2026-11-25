@@ -52,4 +52,6 @@
     <string name="settings_update_title">Cập nhật ứng dụng</string>
     <string name="settings_update_desc">LockTimer kiểm tra phiên bản mới và hỗ trợ cập nhật APK.</string>
     <string name="about_tagline">Hẹn giờ khóa màn hình · Tập trung hơn mỗi ngày.</string>
+    <string name="chip_minutes_compact">%1$dm</string>
+    <string name="chip_hours_compact">%1$dh</string>
 </resources>
