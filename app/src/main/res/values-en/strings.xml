@@ -12,6 +12,10 @@
     <string name="notif_lock_failed_title">Unable to lock the screen</string>
     <string name="notif_lock_failed_text">Device Admin permission is missing. Open the app, grant permission, and try again.</string>
     <string name="ui_title">Schedule screen lock</string>
+    <string name="ui_tagline">Own your time · Lock automatically</string>
+    <string name="ui_version_label">Version %1$s</string>
+    <string name="ui_choose_duration">CHOOSE A DURATION</string>
+    <string name="ui_remaining">REMAINING</string>
     <string name="about_website">Official website · khahdihdz.github.io/LockTimer</string>
     <string name="about_author">Developed by khahdihdz · GitHub</string>
     <string name="ui_start">Start countdown</string>
