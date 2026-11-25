@@ -21,6 +21,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -57,10 +58,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -245,12 +248,16 @@ class MainActivity : ComponentActivity() {
 fun LockTimerTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colorScheme = darkColorScheme(
-            primary = Color(0xFF8AB4F8),
-            background = Color(0xFF101418),
-            surface = Color(0xFF161B21),
-            onPrimary = Color(0xFF0B1020),
-            onBackground = Color(0xFFE6EAF0),
-            onSurface = Color(0xFFE6EAF0)
+            primary = Color(0xFF24D5EF),
+            secondary = Color(0xFF7C9DFF),
+            tertiary = Color(0xFF8A7CFF),
+            background = Color(0xFF071326),
+            surface = Color(0xFF10213D),
+            surfaceVariant = Color(0xFF172B4B),
+            onPrimary = Color(0xFF04172B),
+            onBackground = Color(0xFFF1F7FF),
+            onSurface = Color(0xFFF1F7FF),
+            onSurfaceVariant = Color(0xFFB6C7E0)
         ),
         content = content
     )
@@ -263,35 +270,81 @@ fun LockTimerScreen(
     onCancel: () -> Unit
 ) {
     var minutesText by remember { mutableStateOf("15") }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(24.dp),
+            .padding(horizontal = 20.dp, vertical = 22.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.spacedBy(18.dp)
     ) {
-        Text(
-            text = stringResource(R.string.ui_title),
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center
-        )
-
-        Spacer(modifier = Modifier.height(24.dp))
-
-        if (!state.running) {
-            IdleContent(
-                minutesText = minutesText,
-                onMinutesChange = { minutesText = it },
-                onStart = onStart
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Image(
+                painter = painterResource(R.drawable.ic_timer),
+                contentDescription = stringResource(R.string.app_name),
+                modifier = Modifier.size(54.dp)
             )
-        } else {
-            RunningContent(state = state, onCancel = onCancel)
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = stringResource(R.string.app_name),
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+                Text(
+                    text = stringResource(R.string.ui_tagline),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            Surface(
+                shape = RoundedCornerShape(50),
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.13f)
+            ) {
+                Text(
+                    text = "v${BuildConfig.VERSION_NAME}",
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+                    color = MaterialTheme.colorScheme.primary,
+                    style = MaterialTheme.typography.labelMedium,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(28.dp),
+            color = MaterialTheme.colorScheme.surface,
+            tonalElevation = 5.dp,
+            shadowElevation = 8.dp
+        ) {
+            Column(
+                modifier = Modifier.padding(22.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text(
+                    text = stringResource(R.string.ui_title),
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+                if (!state.running) {
+                    IdleContent(
+                        minutesText = minutesText,
+                        onMinutesChange = { minutesText = it },
+                        onStart = onStart
+                    )
+                } else {
+                    RunningContent(state = state, onCancel = onCancel)
+                }
+            }
+        }
+
         AboutFooter()
     }
 }
@@ -299,16 +352,14 @@ fun LockTimerScreen(
 @Composable
 private fun AboutFooter() {
     val context = LocalContext.current
-    val linkColor = MaterialTheme.colorScheme.primary
-
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(6.dp)
+        verticalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         Text(
             text = stringResource(R.string.about_website),
-            color = linkColor,
+            color = MaterialTheme.colorScheme.primary,
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
             modifier = Modifier.clickable {
@@ -321,7 +372,7 @@ private fun AboutFooter() {
         )
         Text(
             text = stringResource(R.string.about_author),
-            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.72f),
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
             modifier = Modifier.clickable {
@@ -331,6 +382,11 @@ private fun AboutFooter() {
                     )
                 }
             }
+        )
+        Text(
+            text = stringResource(R.string.ui_version_label, BuildConfig.VERSION_NAME),
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
+            style = MaterialTheme.typography.labelSmall
         )
     }
 }
@@ -342,6 +398,12 @@ private fun IdleContent(
     onStart: (Int) -> Unit
 ) {
     val presets = listOf(5, 15, 30, 60, 120)
+    Text(
+        text = stringResource(R.string.ui_choose_duration),
+        modifier = Modifier.fillMaxWidth(),
+        style = MaterialTheme.typography.labelLarge,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -357,12 +419,10 @@ private fun IdleContent(
             FilterChip(
                 selected = minutesText == preset.toString(),
                 onClick = { onMinutesChange(preset.toString()) },
-                label = { Text(label) }
+                label = { Text(label, fontWeight = FontWeight.SemiBold) }
             )
         }
     }
-
-    Spacer(modifier = Modifier.height(16.dp))
 
     OutlinedTextField(
         value = minutesText,
@@ -371,27 +431,29 @@ private fun IdleContent(
         },
         label = { Text(stringResource(R.string.ui_minutes_label)) },
         singleLine = true,
+        shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth()
     )
-
-    Spacer(modifier = Modifier.height(16.dp))
 
     Text(
         text = stringResource(R.string.ui_idle_hint),
         style = MaterialTheme.typography.bodyMedium,
         textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+        color = MaterialTheme.colorScheme.onSurfaceVariant
     )
-
-    Spacer(modifier = Modifier.height(16.dp))
 
     val minutes = minutesText.toIntOrNull() ?: 0
     Button(
         onClick = { onStart(minutes) },
         enabled = minutes > 0,
-        modifier = Modifier.fillMaxWidth()
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().height(54.dp)
     ) {
-        Text(text = stringResource(R.string.ui_start))
+        Text(
+            text = stringResource(R.string.ui_start),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
     }
 }
 
@@ -402,25 +464,19 @@ private fun RunningContent(
 ) {
     val progress = if (state.totalMillis > 0) {
         (state.remainingMillis.toFloat() / state.totalMillis.toFloat()).coerceIn(0f, 1f)
-    } else {
-        0f
-    }
+    } else 0f
     val trackColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.12f)
     val progressColor = MaterialTheme.colorScheme.primary
-    val textColor = MaterialTheme.colorScheme.onBackground
 
     Text(
         text = stringResource(R.string.ui_running_hint),
         style = MaterialTheme.typography.bodyMedium,
         textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+        color = MaterialTheme.colorScheme.onSurfaceVariant
     )
-
-    Spacer(modifier = Modifier.height(24.dp))
-
     Box(contentAlignment = Alignment.Center) {
         Canvas(modifier = Modifier.size(220.dp)) {
-            val stroke = 14.dp.toPx()
+            val stroke = 15.dp.toPx()
             val topLeft = Offset(stroke / 2f, stroke / 2f)
             val arcSize = Size(size.width - stroke, size.height - stroke)
             drawArc(
@@ -442,20 +498,25 @@ private fun RunningContent(
                 style = Stroke(width = stroke, cap = StrokeCap.Round)
             )
         }
-        Text(
-            text = formatRemaining(state.remainingMillis),
-            fontSize = 36.sp,
-            fontWeight = FontWeight.Bold,
-            color = textColor
-        )
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = formatRemaining(state.remainingMillis),
+                fontSize = 34.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Text(
+                text = stringResource(R.string.ui_remaining),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
     }
-
-    Spacer(modifier = Modifier.height(24.dp))
-
     OutlinedButton(
         onClick = onCancel,
-        modifier = Modifier.fillMaxWidth()
+        shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth().height(52.dp)
     ) {
-        Text(text = stringResource(R.string.ui_cancel))
+        Text(text = stringResource(R.string.ui_cancel), fontWeight = FontWeight.SemiBold)
     }
 }
