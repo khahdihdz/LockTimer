@@ -29,4 +29,8 @@
     <string name="update_available_title">Đã có LockTimer %1$s</string>
     <string name="update_available_message">Phiên bản mới đã sẵn sàng. Bạn có thể tải và cài đặt trực tiếp trong ứng dụng.</string>
     <string name="update_button">Tải và cập nhật</string>
+    <string name="update_download_description">Đang tải bản cập nhật LockTimer</string>
+    <string name="update_download_file_missing">Không tìm thấy tệp APK đã tải.</string>
+    <string name="update_download_failed_code">Tải APK thất bại (mã %1$d).</string>
+    <string name="update_download_timeout">Đã hết thời gian chờ tải APK.</string>
 </resources>
