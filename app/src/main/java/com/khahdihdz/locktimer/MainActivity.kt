@@ -39,6 +39,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -269,114 +271,203 @@ fun LockTimerScreen(
     onStart: (Int) -> Unit,
     onCancel: () -> Unit
 ) {
-    var minutesText by remember { mutableStateOf("15") }
+    var minutesText by remember { mutableStateOf("30") }
+    var selectedTab by remember { mutableStateOf(0) }
+
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 20.dp, vertical = 18.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.Center
+        Column(
+            modifier = Modifier.weight(1f).verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp, vertical = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp)
         ) {
-            Image(
-                painter = painterResource(R.drawable.ic_timer),
-                contentDescription = stringResource(R.string.app_name),
-                modifier = Modifier.size(52.dp)
-            )
-            Spacer(modifier = Modifier.size(12.dp))
-            Column {
-                Text(
-                    text = stringResource(R.string.app_name),
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Text(
-                    text = stringResource(R.string.ui_tagline),
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-        }
-
-        Surface(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(28.dp),
-            color = MaterialTheme.colorScheme.surface,
-            tonalElevation = 3.dp,
-            shadowElevation = 6.dp
-        ) {
-            Column(
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 22.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = stringResource(R.string.ui_title),
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
+                Image(
+                    painter = painterResource(R.drawable.ic_timer),
+                    contentDescription = stringResource(R.string.app_name),
+                    modifier = Modifier.size(48.dp)
                 )
-                if (!state.running) {
-                    IdleContent(
-                        minutesText = minutesText,
-                        onMinutesChange = { minutesText = it },
-                        onStart = onStart
+                Spacer(Modifier.size(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        stringResource(R.string.app_name),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.ExtraBold
                     )
-                } else {
-                    RunningContent(state = state, onCancel = onCancel)
+                    Text(
+                        stringResource(R.string.ui_tagline),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
+                Text("◷", color = MaterialTheme.colorScheme.primary, fontSize = 28.sp)
+            }
+
+            when (selectedTab) {
+                0 -> {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        Text(
+                            stringResource(R.string.ui_title),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            stringResource(R.string.ui_home_subtitle),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    Surface(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(30.dp),
+                        color = MaterialTheme.colorScheme.surface,
+                        shadowElevation = 8.dp
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(horizontal = 18.dp, vertical = 20.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.spacedBy(18.dp)
+                        ) {
+                            if (!state.running) {
+                                IdleContent(
+                                    minutesText = minutesText,
+                                    onMinutesChange = { minutesText = it },
+                                    onStart = onStart
+                                )
+                            } else {
+                                RunningContent(state = state, onCancel = onCancel)
+                            }
+                        }
+                    }
+                    FeatureStrip()
+                }
+                1 -> SettingsPanel()
+                else -> AboutPanel()
             }
         }
 
-        AboutFooter()
+        NavigationBar(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        ) {
+            val tabs = listOf(
+                Triple("⌂", stringResource(R.string.nav_home), 0),
+                Triple("⚙", stringResource(R.string.nav_settings), 1),
+                Triple("ⓘ", stringResource(R.string.nav_about), 2)
+            )
+            tabs.forEach { (symbol, label, index) ->
+                NavigationBarItem(
+                    selected = selectedTab == index,
+                    onClick = { selectedTab = index },
+                    icon = { Text(symbol, fontSize = 21.sp, fontWeight = FontWeight.Bold) },
+                    label = { Text(label, style = MaterialTheme.typography.labelSmall) }
+                )
+            }
+        }
     }
 }
 
 @Composable
-private fun AboutFooter() {
+private fun FeatureStrip() {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(22.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.65f)
+    ) {
+        Row(
+            modifier = Modifier.padding(vertical = 16.dp, horizontal = 10.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            FeatureItem("◷", stringResource(R.string.feature_flexible))
+            FeatureItem("▣", stringResource(R.string.feature_auto_lock))
+            FeatureItem("↻", stringResource(R.string.feature_background))
+        }
+    }
+}
+
+@Composable
+private fun FeatureItem(symbol: String, label: String) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        modifier = Modifier.weight(1f)
+    ) {
+        Text(symbol, color = MaterialTheme.colorScheme.primary, fontSize = 23.sp)
+        Text(
+            label,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            style = MaterialTheme.typography.labelSmall,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+private fun SettingsPanel() {
+    Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+        Text(stringResource(R.string.nav_settings), style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+        Text(stringResource(R.string.settings_subtitle), color = MaterialTheme.colorScheme.onSurfaceVariant)
+        SettingsRow("◷", stringResource(R.string.settings_timer_title), stringResource(R.string.settings_timer_desc))
+        SettingsRow("▣", stringResource(R.string.settings_lock_title), stringResource(R.string.settings_lock_desc))
+        SettingsRow("↻", stringResource(R.string.settings_update_title), stringResource(R.string.settings_update_desc))
+    }
+}
+
+@Composable
+private fun SettingsRow(symbol: String, title: String, description: String) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        color = MaterialTheme.colorScheme.surface
+    ) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            Text(symbol, color = MaterialTheme.colorScheme.primary, fontSize = 25.sp)
+            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(title, fontWeight = FontWeight.SemiBold)
+                Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+    }
+}
+
+@Composable
+private fun AboutPanel() {
     val context = LocalContext.current
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(5.dp)
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        Text(
-            text = stringResource(R.string.about_website),
-            color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.clickable {
-                runCatching {
-                    context.startActivity(
-                        Intent(Intent.ACTION_VIEW, Uri.parse("https://khahdihdz.github.io/LockTimer/"))
-                    )
-                }
+        Image(painterResource(R.drawable.ic_timer), null, modifier = Modifier.size(88.dp))
+        Text(stringResource(R.string.app_name), style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.ExtraBold)
+        Text(stringResource(R.string.about_tagline), textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Surface(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(22.dp),
+            color = MaterialTheme.colorScheme.surface
+        ) {
+            Column(modifier = Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Text(stringResource(R.string.ui_version_label, BuildConfig.VERSION_NAME), fontWeight = FontWeight.SemiBold)
+                Text(stringResource(R.string.about_website), color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.clickable {
+                        runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://khahdihdz.github.io/LockTimer/"))) }
+                    })
+                Text(stringResource(R.string.about_author), color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.clickable {
+                        runCatching { context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/khahdihdz"))) }
+                    })
             }
-        )
-        Text(
-            text = stringResource(R.string.about_author),
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.clickable {
-                runCatching {
-                    context.startActivity(
-                        Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/khahdihdz"))
-                    )
-                }
-            }
-        )
-        Text(
-            text = stringResource(R.string.ui_version_label, BuildConfig.VERSION_NAME),
-            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
-            style = MaterialTheme.typography.labelSmall
-        )
+        }
     }
 }
 
@@ -392,74 +483,33 @@ private fun IdleContent(
     val trackColor = ringColor.copy(alpha = 0.14f)
 
     Box(contentAlignment = Alignment.Center) {
-        Canvas(modifier = Modifier.size(184.dp)) {
-            val stroke = 12.dp.toPx()
+        Canvas(modifier = Modifier.size(196.dp)) {
+            val stroke = 13.dp.toPx()
             val inset = stroke / 2f
             val arcSize = Size(size.width - stroke, size.height - stroke)
-            drawArc(
-                color = trackColor,
-                startAngle = -90f,
-                sweepAngle = 360f,
-                useCenter = false,
-                topLeft = Offset(inset, inset),
-                size = arcSize,
-                style = Stroke(width = stroke, cap = StrokeCap.Round)
-            )
-            drawArc(
-                color = ringColor,
-                startAngle = -90f,
-                sweepAngle = 285f,
-                useCenter = false,
-                topLeft = Offset(inset, inset),
-                size = arcSize,
-                style = Stroke(width = stroke, cap = StrokeCap.Round)
-            )
+            drawArc(trackColor, -90f, 360f, false, Offset(inset, inset), arcSize, style = Stroke(stroke, cap = StrokeCap.Round))
+            drawArc(ringColor, -90f, 285f, false, Offset(inset, inset), arcSize, style = Stroke(stroke, cap = StrokeCap.Round))
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = stringResource(R.string.ui_choose_duration),
-                style = MaterialTheme.typography.labelMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                text = formatRemaining(minutes.coerceAtLeast(0) * 60_000L),
-                fontSize = 34.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            Text(
-                text = stringResource(R.string.ui_remaining),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Text(stringResource(R.string.ui_choose_duration), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            Text(formatRemaining(minutes.coerceAtLeast(0) * 60_000L), fontSize = 36.sp, fontWeight = FontWeight.ExtraBold)
+            Text(stringResource(R.string.ui_remaining), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
 
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(10.dp)
-    ) {
-        Text(
-            text = stringResource(R.string.ui_choose_duration),
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text(stringResource(R.string.ui_choose_duration), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
         ) {
             presets.forEach { preset ->
-                val label = if (preset >= 60) {
-                    stringResource(R.string.chip_hours, preset / 60)
-                } else {
-                    stringResource(R.string.chip_minutes, preset)
-                }
+                val label = if (preset >= 60) stringResource(R.string.chip_hours, preset / 60) else stringResource(R.string.chip_minutes, preset)
                 FilterChip(
+                    modifier = Modifier.weight(1f),
                     selected = minutesText == preset.toString(),
                     onClick = { onMinutesChange(preset.toString()) },
-                    label = { Text(label, fontWeight = FontWeight.SemiBold) }
+                    label = { Text(label, fontWeight = FontWeight.SemiBold, maxLines = 1) }
                 )
             }
         }
@@ -467,96 +517,44 @@ private fun IdleContent(
 
     OutlinedTextField(
         value = minutesText,
-        onValueChange = { value ->
-            onMinutesChange(value.filter { it.isDigit() }.take(5))
-        },
+        onValueChange = { onMinutesChange(it.filter(Char::isDigit).take(5)) },
         label = { Text(stringResource(R.string.ui_minutes_label)) },
         singleLine = true,
         shape = RoundedCornerShape(16.dp),
         modifier = Modifier.fillMaxWidth()
     )
-
-    Text(
-        text = stringResource(R.string.ui_idle_hint),
-        style = MaterialTheme.typography.bodySmall,
-        textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
-    )
-
+    Text(stringResource(R.string.ui_idle_hint), style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant)
     Button(
         onClick = { onStart(minutes) },
         enabled = minutes > 0,
         shape = RoundedCornerShape(18.dp),
-        modifier = Modifier.fillMaxWidth().height(56.dp)
+        modifier = Modifier.fillMaxWidth().height(58.dp)
     ) {
-        Text(
-            text = stringResource(R.string.ui_start),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold
-        )
+        Text(stringResource(R.string.ui_start), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
     }
 }
 
 @Composable
-private fun RunningContent(
-    state: TimerUiState,
-    onCancel: () -> Unit
-) {
-    val progress = if (state.totalMillis > 0) {
-        (state.remainingMillis.toFloat() / state.totalMillis.toFloat()).coerceIn(0f, 1f)
-    } else 0f
+private fun RunningContent(state: TimerUiState, onCancel: () -> Unit) {
+    val progress = if (state.totalMillis > 0) (state.remainingMillis.toFloat() / state.totalMillis.toFloat()).coerceIn(0f, 1f) else 0f
     val trackColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.12f)
     val progressColor = MaterialTheme.colorScheme.primary
 
-    Text(
-        text = stringResource(R.string.ui_running_hint),
-        style = MaterialTheme.typography.bodyMedium,
-        textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
-    )
+    Text(stringResource(R.string.ui_running_hint), style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center, color = MaterialTheme.colorScheme.onSurfaceVariant)
     Box(contentAlignment = Alignment.Center) {
         Canvas(modifier = Modifier.size(220.dp)) {
             val stroke = 15.dp.toPx()
             val topLeft = Offset(stroke / 2f, stroke / 2f)
             val arcSize = Size(size.width - stroke, size.height - stroke)
-            drawArc(
-                color = trackColor,
-                startAngle = -90f,
-                sweepAngle = 360f,
-                useCenter = false,
-                topLeft = topLeft,
-                size = arcSize,
-                style = Stroke(width = stroke, cap = StrokeCap.Round)
-            )
-            drawArc(
-                color = progressColor,
-                startAngle = -90f,
-                sweepAngle = 360f * progress,
-                useCenter = false,
-                topLeft = topLeft,
-                size = arcSize,
-                style = Stroke(width = stroke, cap = StrokeCap.Round)
-            )
+            drawArc(trackColor, -90f, 360f, false, topLeft, arcSize, style = Stroke(stroke, cap = StrokeCap.Round))
+            drawArc(progressColor, -90f, 360f * progress, false, topLeft, arcSize, style = Stroke(stroke, cap = StrokeCap.Round))
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = formatRemaining(state.remainingMillis),
-                fontSize = 34.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-            Text(
-                text = stringResource(R.string.ui_remaining),
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Text(formatRemaining(state.remainingMillis), fontSize = 36.sp, fontWeight = FontWeight.ExtraBold)
+            Text(stringResource(R.string.ui_remaining), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
-    OutlinedButton(
-        onClick = onCancel,
-        shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth().height(52.dp)
-    ) {
-        Text(text = stringResource(R.string.ui_cancel), fontWeight = FontWeight.SemiBold)
+    OutlinedButton(onClick = onCancel, shape = RoundedCornerShape(16.dp), modifier = Modifier.fillMaxWidth().height(52.dp)) {
+        Text(stringResource(R.string.ui_cancel), fontWeight = FontWeight.SemiBold)
     }
 }
