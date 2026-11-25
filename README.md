@@ -38,21 +38,17 @@ Mở tab [Releases](https://github.com/khahdihdz/LockTimer/releases) và tải f
 ## Build
 
 ```bash
-./gradlew :app:assembleDebug     # Free debug (dùng quảng cáo thử nghiệm Google)
-./gradlew :app:assembleRelease   # Free release (chưa ký)
-./gradlew :app:assemblePro       # Pro release (không tích hợp SDK quảng cáo)
+./gradlew :app:assembleDebug     # Debug, không quảng cáo
+./gradlew :app:assembleRelease   # Release, không quảng cáo (chưa ký)
 ```
 
-## Free / Pro và Gumroad
+## Không quảng cáo
 
-- **Free** là build mặc định (`debug` / `release`): tích hợp Google Mobile Ads Next-Gen và chỉ hiển thị banner ở màn hình chờ, không hiển thị khi bộ đếm đang chạy.
-- **Pro** dùng build type riêng (`pro`): không đóng gói SDK quảng cáo và không hiển thị quảng cáo.
-- Cả hai giữ cùng `applicationId` (`com.khahdihdz.locktimer`) để người dùng có thể cập nhật/chuyển bản khi cùng được ký bằng keystore chính thức.
-- Debug dùng test IDs chính thức của Google. Free release chỉ bật quảng cáo khi cung cấp App ID và Banner Ad Unit ID thật qua Gradle properties:
-  `-PADMOB_APP_ID=... -PADMOB_BANNER_UNIT_ID=...`.
-- Không tải APK Pro lên GitHub Releases công khai. Build Pro, ký bằng cùng keystore chính thức rồi tải file lên sản phẩm LockTimer Pro trên Gumroad.
-- Gumroad giao file APK sau thanh toán; bản Pro hiện là file phân phối trực tiếp, không có License Key hoặc xác minh giấy phép trực tuyến.
-
+LockTimer là một phiên bản duy nhất, hoàn toàn không tích hợp quảng cáo:
+- Không Google Mobile Ads / AdMob SDK trong Debug hoặc Release.
+- Không khởi tạo SDK, không tải banner và không có vị trí quảng cáo trong giao diện.
+- Không có AdMob App ID hoặc Ad Unit ID trong cấu hình build.
+- Quyền Internet vẫn được giữ vì ứng dụng cần kiểm tra và tải bản cập nhật từ GitHub Releases.
 
 ## Ký APK & Release
 
