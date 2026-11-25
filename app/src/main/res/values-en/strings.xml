@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">LockTimer</string>
+    <string name="device_admin_explanation">LockTimer needs Device Admin permission to automatically lock your screen when the timer ends. This permission is used only for the screen-lock action.</string>
+    <string name="notif_channel_timer">Lock countdown</string>
+    <string name="notif_channel_timer_desc">Shows the remaining time until your screen is locked</string>
+    <string name="notif_channel_locked">Timer result</string>
+    <string name="notif_channel_locked_desc">Notifies you when LockTimer completes the countdown</string>
+    <string name="notif_timer_title">Screen-lock countdown running</string>
+    <string name="notif_locked_title">Screen locked</string>
+    <string name="notif_locked_text">LockTimer locked your screen at the scheduled time.</string>
+    <string name="notif_lock_failed_title">Unable to lock the screen</string>
+    <string name="notif_lock_failed_text">Device Admin permission is missing. Open the app, grant permission, and try again.</string>
+    <string name="ui_title">Schedule screen lock</string>
+    <string name="about_website">Official website · khahdihdz.github.io/LockTimer</string>
+    <string name="about_author">Developed by khahdihdz · GitHub</string>
+    <string name="ui_start">Start countdown</string>
+    <string name="ui_cancel">Cancel timer</string>
+    <string name="ui_minutes_label">Duration (minutes)</string>
+    <string name="ui_idle_hint">Your screen will lock automatically when the selected time is up.</string>
+    <string name="ui_running_hint">LockTimer will lock your screen when the countdown reaches zero.</string>
+    <string name="chip_minutes">%1$d min</string>
+    <string name="chip_hours">%1$d hr</string>
+    <string name="admin_denied">Device Admin permission has not been granted, so the timer cannot start.</string>
+    <string name="admin_error">Unable to open the Device Admin permission screen.</string>
+    <string name="update_allow_unknown_sources">Allow LockTimer to install apps from this source, then return and tap Update.</string>
+    <string name="update_downloading">Downloading update…</string>
+    <string name="update_failed">Unable to update: %1$s</string>
+    <string name="update_available_title">LockTimer %1$s is available</string>
+    <string name="update_available_message">A new version is ready. You can download and install it directly from the app.</string>
+    <string name="update_button">Download & update</string>
+</resources>
