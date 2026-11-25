@@ -34,6 +34,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -275,13 +278,13 @@ fun LockTimerScreen(
     var selectedTab by remember { mutableStateOf(0) }
 
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.safeDrawing),
         verticalArrangement = Arrangement.SpaceBetween
     ) {
         Column(
             modifier = Modifier.weight(1f).verticalScroll(rememberScrollState())
-                .padding(horizontal = 20.dp, vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(18.dp)
+                .padding(horizontal = 18.dp, vertical = 10.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -290,7 +293,7 @@ fun LockTimerScreen(
                 Image(
                     painter = painterResource(R.drawable.ic_timer),
                     contentDescription = stringResource(R.string.app_name),
-                    modifier = Modifier.size(48.dp)
+                    modifier = Modifier.size(42.dp)
                 )
                 Spacer(Modifier.size(12.dp))
                 Column(modifier = Modifier.weight(1f)) {
@@ -313,7 +316,7 @@ fun LockTimerScreen(
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(
                             stringResource(R.string.ui_title),
-                            style = MaterialTheme.typography.titleLarge,
+                            style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
                         Text(
@@ -324,14 +327,14 @@ fun LockTimerScreen(
                     }
                     Surface(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(30.dp),
+                        shape = RoundedCornerShape(26.dp),
                         color = MaterialTheme.colorScheme.surface,
                         shadowElevation = 8.dp
                     ) {
                         Column(
-                            modifier = Modifier.padding(horizontal = 18.dp, vertical = 20.dp),
+                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 14.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.spacedBy(18.dp)
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             if (!state.running) {
                                 IdleContent(
@@ -344,7 +347,6 @@ fun LockTimerScreen(
                             }
                         }
                     }
-                    FeatureStrip()
                 }
                 1 -> SettingsPanel()
                 else -> AboutPanel()
@@ -483,7 +485,7 @@ private fun IdleContent(
     val trackColor = ringColor.copy(alpha = 0.14f)
 
     Box(contentAlignment = Alignment.Center) {
-        Canvas(modifier = Modifier.size(196.dp)) {
+        Canvas(modifier = Modifier.size(168.dp)) {
             val stroke = 13.dp.toPx()
             val inset = stroke / 2f
             val arcSize = Size(size.width - stroke, size.height - stroke)
@@ -492,7 +494,7 @@ private fun IdleContent(
         }
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(stringResource(R.string.ui_choose_duration), style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(formatRemaining(minutes.coerceAtLeast(0) * 60_000L), fontSize = 36.sp, fontWeight = FontWeight.ExtraBold)
+            Text(formatRemaining(minutes.coerceAtLeast(0) * 60_000L), fontSize = 32.sp, fontWeight = FontWeight.ExtraBold)
             Text(stringResource(R.string.ui_remaining), style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
     }
@@ -501,15 +503,15 @@ private fun IdleContent(
         Text(stringResource(R.string.ui_choose_duration), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             presets.forEach { preset ->
-                val label = if (preset >= 60) stringResource(R.string.chip_hours, preset / 60) else stringResource(R.string.chip_minutes, preset)
+                val label = if (preset >= 60) stringResource(R.string.chip_hours_compact, preset / 60) else stringResource(R.string.chip_minutes_compact, preset)
                 FilterChip(
                     modifier = Modifier.weight(1f),
                     selected = minutesText == preset.toString(),
                     onClick = { onMinutesChange(preset.toString()) },
-                    label = { Text(label, fontWeight = FontWeight.SemiBold, maxLines = 1) }
+                    label = { Text(label, fontWeight = FontWeight.SemiBold, maxLines = 1, fontSize = 12.sp) }
                 )
             }
         }
@@ -528,7 +530,7 @@ private fun IdleContent(
         onClick = { onStart(minutes) },
         enabled = minutes > 0,
         shape = RoundedCornerShape(18.dp),
-        modifier = Modifier.fillMaxWidth().height(58.dp)
+        modifier = Modifier.fillMaxWidth().height(54.dp)
     ) {
         Text(stringResource(R.string.ui_start), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
     }
