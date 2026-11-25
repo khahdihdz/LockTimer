@@ -122,7 +122,7 @@ class MainActivity : ComponentActivity() {
 
     private fun installUpdate(info: UpdateInfo) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && !packageManager.canRequestPackageInstalls()) {
-            Toast.makeText(this, "Hãy cho phép LockTimer cài ứng dụng không rõ nguồn gốc rồi nhấn Cập nhật lại.", Toast.LENGTH_LONG).show()
+            Toast.makeText(this, getString(R.string.update_allow_unknown_sources), Toast.LENGTH_LONG).show()
             runCatching {
                 startActivity(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES, Uri.parse("package:$packageName")))
             }
@@ -130,7 +130,7 @@ class MainActivity : ComponentActivity() {
         }
         lifecycleScope.launch {
             try {
-                Toast.makeText(this@MainActivity, "Đang tải bản cập nhật…", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@MainActivity, getString(R.string.update_downloading), Toast.LENGTH_SHORT).show()
                 val apkUri = withContext(Dispatchers.IO) { downloadUpdate(info) }
                 val intent = Intent(Intent.ACTION_VIEW).apply {
                     setDataAndType(apkUri, "application/vnd.android.package-archive")
@@ -138,7 +138,7 @@ class MainActivity : ComponentActivity() {
                 }
                 startActivity(intent)
             } catch (error: Exception) {
-                Toast.makeText(this@MainActivity, "Không thể cập nhật: ${error.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@MainActivity, getString(R.string.update_failed, error.message ?: ""), Toast.LENGTH_LONG).show()
             }
         }
     }
