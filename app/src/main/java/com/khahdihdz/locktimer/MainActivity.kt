@@ -274,24 +274,25 @@ fun LockTimerScreen(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 20.dp, vertical = 22.dp),
+            .padding(horizontal = 20.dp, vertical = 18.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(18.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(14.dp)
+            horizontalArrangement = Arrangement.Center
         ) {
             Image(
                 painter = painterResource(R.drawable.ic_timer),
                 contentDescription = stringResource(R.string.app_name),
-                modifier = Modifier.size(54.dp)
+                modifier = Modifier.size(52.dp)
             )
-            Column(modifier = Modifier.weight(1f)) {
+            Spacer(modifier = Modifier.size(12.dp))
+            Column {
                 Text(
                     text = stringResource(R.string.app_name),
-                    style = MaterialTheme.typography.headlineSmall,
+                    style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.ExtraBold,
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -301,29 +302,17 @@ fun LockTimerScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            Surface(
-                shape = RoundedCornerShape(50),
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.13f)
-            ) {
-                Text(
-                    text = "v${BuildConfig.VERSION_NAME}",
-                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
-                    color = MaterialTheme.colorScheme.primary,
-                    style = MaterialTheme.typography.labelMedium,
-                    fontWeight = FontWeight.Bold
-                )
-            }
         }
 
         Surface(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(28.dp),
             color = MaterialTheme.colorScheme.surface,
-            tonalElevation = 5.dp,
-            shadowElevation = 8.dp
+            tonalElevation = 3.dp,
+            shadowElevation = 6.dp
         ) {
             Column(
-                modifier = Modifier.padding(22.dp),
+                modifier = Modifier.padding(horizontal = 20.dp, vertical = 22.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
@@ -398,29 +387,79 @@ private fun IdleContent(
     onStart: (Int) -> Unit
 ) {
     val presets = listOf(5, 15, 30, 60, 120)
-    Text(
-        text = stringResource(R.string.ui_choose_duration),
-        modifier = Modifier.fillMaxWidth(),
-        style = MaterialTheme.typography.labelLarge,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
-    )
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        presets.forEach { preset ->
-            val label = if (preset >= 60) {
-                stringResource(R.string.chip_hours, preset / 60)
-            } else {
-                stringResource(R.string.chip_minutes, preset)
-            }
-            FilterChip(
-                selected = minutesText == preset.toString(),
-                onClick = { onMinutesChange(preset.toString()) },
-                label = { Text(label, fontWeight = FontWeight.SemiBold) }
+    val minutes = minutesText.toIntOrNull() ?: 0
+
+    Box(contentAlignment = Alignment.Center) {
+        Canvas(modifier = Modifier.size(184.dp)) {
+            val stroke = 12.dp.toPx()
+            val inset = stroke / 2f
+            val arcSize = Size(size.width - stroke, size.height - stroke)
+            drawArc(
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.14f),
+                startAngle = -90f,
+                sweepAngle = 360f,
+                useCenter = false,
+                topLeft = Offset(inset, inset),
+                size = arcSize,
+                style = Stroke(width = stroke, cap = StrokeCap.Round)
             )
+            drawArc(
+                color = MaterialTheme.colorScheme.primary,
+                startAngle = -90f,
+                sweepAngle = 285f,
+                useCenter = false,
+                topLeft = Offset(inset, inset),
+                size = arcSize,
+                style = Stroke(width = stroke, cap = StrokeCap.Round)
+            )
+        }
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = stringResource(R.string.ui_choose_duration),
+                style = MaterialTheme.typography.labelMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                text = formatRemaining(minutes.coerceAtLeast(0) * 60_000L),
+                fontSize = 34.sp,
+                fontWeight = FontWeight.ExtraBold,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Text(
+                text = stringResource(R.string.ui_remaining),
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(10.dp)
+    ) {
+        Text(
+            text = stringResource(R.string.ui_choose_duration),
+            style = MaterialTheme.typography.labelLarge,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            presets.forEach { preset ->
+                val label = if (preset >= 60) {
+                    stringResource(R.string.chip_hours, preset / 60)
+                } else {
+                    stringResource(R.string.chip_minutes, preset)
+                }
+                FilterChip(
+                    selected = minutesText == preset.toString(),
+                    onClick = { onMinutesChange(preset.toString()) },
+                    label = { Text(label, fontWeight = FontWeight.SemiBold) }
+                )
+            }
         }
     }
 
@@ -437,17 +476,16 @@ private fun IdleContent(
 
     Text(
         text = stringResource(R.string.ui_idle_hint),
-        style = MaterialTheme.typography.bodyMedium,
+        style = MaterialTheme.typography.bodySmall,
         textAlign = TextAlign.Center,
         color = MaterialTheme.colorScheme.onSurfaceVariant
     )
 
-    val minutes = minutesText.toIntOrNull() ?: 0
     Button(
         onClick = { onStart(minutes) },
         enabled = minutes > 0,
-        shape = RoundedCornerShape(16.dp),
-        modifier = Modifier.fillMaxWidth().height(54.dp)
+        shape = RoundedCornerShape(18.dp),
+        modifier = Modifier.fillMaxWidth().height(56.dp)
     ) {
         Text(
             text = stringResource(R.string.ui_start),
