@@ -12,6 +12,10 @@
     <string name="notif_lock_failed_title">Không thể khóa màn hình</string>
     <string name="notif_lock_failed_text">Thiếu quyền Quản trị viên thiết bị. Hãy mở ứng dụng, cấp quyền và thử lại.</string>
     <string name="ui_title">Hẹn giờ khóa màn hình</string>
+    <string name="ui_tagline">Kiểm soát thời gian · Tự động khóa</string>
+    <string name="ui_version_label">Phiên bản %1$s</string>
+    <string name="ui_choose_duration">CHỌN THỜI LƯỢNG</string>
+    <string name="ui_remaining">CÒN LẠI</string>
     <string name="about_website">Trang web chính thức · khahdihdz.github.io/LockTimer</string>
     <string name="about_author">Phát triển bởi khahdihdz · GitHub</string>
     <string name="ui_start">Bắt đầu đếm ngược</string>
