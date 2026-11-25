@@ -76,3 +76,20 @@ jobs:
             signed-apks/LockTimer-${{ steps.version.outputs.tag }}.apk
           generate_release_notes: true
           make_latest: true
+
+      - name: Delete older GitHub Releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CURRENT_TAG: ${{ steps.version.outputs.tag }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          gh api --paginate "repos/${GH_REPO}/releases?per_page=100" \
+            --jq '.[] | [.id, .tag_name] | @tsv' |
+          while IFS=$'\\t' read -r release_id release_tag; do
+            if [ "${release_tag}" != "${CURRENT_TAG}" ]; then
+              echo "Deleting old release: ${release_tag} (ID: ${release_id})"
+              gh api --method DELETE "repos/${GH_REPO}/releases/${release_id}"
+            fi
+          done
