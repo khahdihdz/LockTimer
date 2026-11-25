@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 
 @Composable
 fun UpdateBanner(
@@ -24,17 +25,17 @@ fun UpdateBanner(
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         Text(
-            text = "Đã có LockTimer ${info.versionName}",
+            text = stringResource(R.string.update_available_title, info.versionName),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary
         )
         Text(
-            text = "Có phiên bản mới. Bạn có thể tải và cài đặt ngay trong ứng dụng.",
+            text = stringResource(R.string.update_available_message),
             style = MaterialTheme.typography.bodySmall
         )
         Row(modifier = Modifier.fillMaxWidth()) {
             Button(onClick = onInstall) {
-                Text("Tải và cập nhật")
+                Text(stringResource(R.string.update_button))
             }
         }
     }
