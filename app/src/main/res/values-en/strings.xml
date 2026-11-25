@@ -52,4 +52,6 @@
     <string name="settings_update_title">App updates</string>
     <string name="settings_update_desc">LockTimer checks for new versions and supports APK updates.</string>
     <string name="about_tagline">Schedule screen lock · Stay focused every day.</string>
+    <string name="chip_minutes_compact">%1$dm</string>
+    <string name="chip_hours_compact">%1$dh</string>
 </resources>
