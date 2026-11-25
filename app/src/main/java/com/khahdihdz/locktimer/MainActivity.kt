@@ -388,6 +388,8 @@ private fun IdleContent(
 ) {
     val presets = listOf(5, 15, 30, 60, 120)
     val minutes = minutesText.toIntOrNull() ?: 0
+    val ringColor = MaterialTheme.colorScheme.primary
+    val trackColor = ringColor.copy(alpha = 0.14f)
 
     Box(contentAlignment = Alignment.Center) {
         Canvas(modifier = Modifier.size(184.dp)) {
@@ -395,7 +397,7 @@ private fun IdleContent(
             val inset = stroke / 2f
             val arcSize = Size(size.width - stroke, size.height - stroke)
             drawArc(
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.14f),
+                color = trackColor,
                 startAngle = -90f,
                 sweepAngle = 360f,
                 useCenter = false,
@@ -404,7 +406,7 @@ private fun IdleContent(
                 style = Stroke(width = stroke, cap = StrokeCap.Round)
             )
             drawArc(
-                color = MaterialTheme.colorScheme.primary,
+                color = ringColor,
                 startAngle = -90f,
                 sweepAngle = 285f,
                 useCenter = false,
