@@ -147,7 +147,7 @@ class MainActivity : ComponentActivity() {
         val manager = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
         val request = DownloadManager.Request(Uri.parse(info.downloadUrl))
             .setTitle("LockTimer ${info.versionName}")
-            .setDescription("Đang tải bản cập nhật")
+            .setDescription(getString(R.string.update_download_description))
             .setMimeType("application/vnd.android.package-archive")
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             .setDestinationInExternalFilesDir(this, Environment.DIRECTORY_DOWNLOADS, info.assetName)
@@ -159,17 +159,17 @@ class MainActivity : ComponentActivity() {
                 if (cursor != null && cursor.moveToFirst()) {
                     when (cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))) {
                         DownloadManager.STATUS_SUCCESSFUL -> return manager.getUriForDownloadedFile(id)
-                            ?: error("Không lấy được tệp APK đã tải")
+                            ?: error(getString(R.string.update_download_file_missing))
                         DownloadManager.STATUS_FAILED -> {
                             val reason = cursor.getInt(cursor.getColumnIndexOrThrow(DownloadManager.COLUMN_REASON))
-                            error("Tải APK thất bại (mã $reason)")
+                            error(getString(R.string.update_download_failed_code, reason))
                         }
                     }
                 }
             }
             Thread.sleep(1000)
         }
-        error("Quá thời gian chờ tải APK")
+        error(getString(R.string.update_download_timeout))
     }
 
     /** Nhấn Bắt đầu: chưa có Device Admin -> xin quyền rồi mới đếm. */
