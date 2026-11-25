@@ -37,4 +37,19 @@
     <string name="update_download_file_missing">Không tìm thấy tệp APK đã tải.</string>
     <string name="update_download_failed_code">Tải APK thất bại (mã %1$d).</string>
     <string name="update_download_timeout">Đã hết thời gian chờ tải APK.</string>
+    <string name="ui_home_subtitle">Chọn thời gian và để LockTimer tự động khóa màn hình.</string>
+    <string name="nav_home">Trang chủ</string>
+    <string name="nav_settings">Cài đặt</string>
+    <string name="nav_about">Giới thiệu</string>
+    <string name="feature_flexible">Hẹn giờ linh hoạt</string>
+    <string name="feature_auto_lock">Tự động khóa</string>
+    <string name="feature_background">Chạy nền ổn định</string>
+    <string name="settings_subtitle">Thông tin về cách LockTimer hoạt động.</string>
+    <string name="settings_timer_title">Hẹn giờ linh hoạt</string>
+    <string name="settings_timer_desc">Chọn thời lượng phù hợp từ 5 phút đến 2 giờ hoặc nhập tùy chỉnh.</string>
+    <string name="settings_lock_title">Tự động khóa màn hình</string>
+    <string name="settings_lock_desc">Cần quyền Quản trị viên thiết bị để khóa màn hình khi hết giờ.</string>
+    <string name="settings_update_title">Cập nhật ứng dụng</string>
+    <string name="settings_update_desc">LockTimer kiểm tra phiên bản mới và hỗ trợ cập nhật APK.</string>
+    <string name="about_tagline">Hẹn giờ khóa màn hình · Tập trung hơn mỗi ngày.</string>
 </resources>
