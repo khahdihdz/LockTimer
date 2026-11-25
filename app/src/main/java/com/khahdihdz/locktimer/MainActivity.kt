@@ -113,11 +113,6 @@ class MainActivity : ComponentActivity() {
                                 onCancel = viewModel::cancel
                             )
                         }
-                        // Free edition shows a small banner only while idle.
-                        // Pro's source-set implementation is intentionally empty.
-                        if (!state.running) {
-                            EditionAdSlot()
-                        }
                     }
                 }
             }
